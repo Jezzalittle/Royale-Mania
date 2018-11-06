@@ -1,0 +1,60 @@
+
+<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script>
+
+    var ctx = document.getElementById("ctx").getContext("2d");
+    ctx.font = '30px Arial';
+
+    var socket = io();
+
+    var id = 0;
+
+    socket.emit('clientCnn', {
+        time: Date()
+    });
+
+
+    socket.on('newPos', function(data){
+        ctx.clearRect(0, 0, 500, 500);
+        for (var i = 0; i < data.player.length; i++)
+        {
+            ctx.fillText(data.player[i].number.toString(), data.player[i].x, data.player[i].y);
+        }
+
+        for (var i = 0; i < data.bullet.length; i++) {
+            ctx.fillRect(data.bullet[i].x - 5, data.bullet[i].y - 5, 10, 10);
+        }
+
+        for (var i = 0; i < data.ball.length; i++) {
+            ctx.fillRect(data.ball[i].x - 5, data.ball[i].y - 5, data.ball[i].size, data.ball[i].size);
+        }
+
+    });
+
+
+
+
+
+
+
+    document.onkeydown = function(event) {
+        if (event.keyCode === 68) //d
+            socket.emit('keyPress', { inputId: 'right', state: true });
+        else if (event.keyCode === 65) //a
+            socket.emit('keyPress', { inputId: 'left', state: true });
+        else if (event.keyCode === 32) // space
+            socket.emit('keyPress', { inputId: 'space', state: true });
+    }
+
+    document.onkeyup = function (event) {
+        if (event.keyCode === 68) //d
+            socket.emit('keyPress', { inputId: 'right', state: false });
+        else if (event.keyCode === 65) //a
+            socket.emit('keyPress', { inputId: 'left', state: false });
+        else if (event.keyCode === 32) // space
+            socket.emit('keyPress', { inputId: 'space', state: false });
+    }
+
+
+</script>
